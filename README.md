@@ -1,0 +1,2 @@
+# SimpleRecyclerViewJava
+sample for RecyclerView

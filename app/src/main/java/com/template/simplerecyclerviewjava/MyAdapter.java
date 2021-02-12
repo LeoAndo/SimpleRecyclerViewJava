@@ -10,13 +10,14 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
-    private final List<Item> items;
+    public final List<Item> items;
     private OnItemClickListener listener;
 
-    public MyAdapter(List<Item> items) {
+    public MyAdapter(ArrayList<Item> items) {
         this.items = items;
     }
 
@@ -39,6 +40,23 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyViewHolder> {
     @Override
     public int getItemCount() {
         return this.items.size();
+    }
+
+    public void updateItem(int position) {
+        Item updateItem = items.get(position);
+        updateItem.setTitle("update: " + updateItem.getTitle());
+        notifyItemChanged(position);
+    }
+
+    public void insertItem(int index, Item newItem) {
+        items.add(index, newItem);
+        notifyItemInserted(index); // 変更がある箇所だけ差分更新する.
+        // notifyDataSetChanged(); // これだとリスト全体の更新が走る.
+    }
+
+    public void removeItem(int index) {
+        items.remove(index);
+        notifyItemRemoved(index);
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder {

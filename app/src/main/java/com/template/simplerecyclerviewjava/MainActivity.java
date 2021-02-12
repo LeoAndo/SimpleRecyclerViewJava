@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
-    private final ArrayList<Item> items = new ArrayList<>();
     private MyAdapter adapter = null;
     private final List<OrderItem> resources = new ArrayList<>(
             Arrays.asList(
@@ -37,8 +36,7 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(false);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        generateDummyItems(10);
-        adapter = new MyAdapter(items);
+        adapter = new MyAdapter(generateDummyItems(10));
         recyclerView.setAdapter(adapter);
         displayTotalPrice();
 
@@ -50,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void displayTotalPrice() {
         int totalPrice = 0;
-        for (Item item : items) {
+        for (Item item : adapter.items) {
             totalPrice += item.getPrice() * item.getAmount();
         }
         NumberFormat format = NumberFormat.getCurrencyInstance();
@@ -61,20 +59,17 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateItem(int position) {
         if (adapter == null) return;
-
-        Item updateItem = items.get(position);
-        updateItem.setTitle("update: " + updateItem.getTitle());
-        adapter.notifyItemChanged(position);
+        adapter.updateItem(position);
     }
 
     public void insertItem(View view) {
         if (adapter == null) return;
 
         int until;
-        if (items.size() == 0) {
+        if (adapter.items.size() == 0) {
             until = 1;
         } else {
-            until = items.size();
+            until = adapter.items.size();
         }
         int index = new Random().nextInt(until);
         int resIndex = new Random().nextInt(resources.size());
@@ -84,9 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 resources.get(resIndex).getPrice(),
                 resources.get(resIndex).getAmount()
         );
-        items.add(index, newItem);
-        adapter.notifyItemInserted(index); // 変更がある箇所だけ差分更新する.
-        // adapter.notifyDataSetChanged(); // これだとリスト全体の更新が走る.
+        adapter.insertItem(index, newItem);
         displayTotalPrice();
         Log.d("aaa", "title: " + resources.get(resIndex).getTitle() + " : index: " + index);
     }
@@ -94,13 +87,12 @@ public class MainActivity extends AppCompatActivity {
     public void removeItem(View view) {
         if (adapter == null) return;
 
-        if (items.size() == 0) {
+        if (adapter.items.size() == 0) {
             showToast("list is empty and cannot be deleted.");
             return;
         }
-        int index = new Random().nextInt(items.size());
-        items.remove(index);
-        adapter.notifyItemRemoved(index);
+        int index = new Random().nextInt(adapter.items.size());
+        adapter.removeItem(index);
         displayTotalPrice();
         Log.d("aaa", "index: " + index);
     }
@@ -109,7 +101,8 @@ public class MainActivity extends AppCompatActivity {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    private void generateDummyItems(int size) {
+    private ArrayList<Item> generateDummyItems(int size) {
+        ArrayList<Item> items = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             int resIndex = new Random().nextInt(resources.size());
             items.add(
@@ -121,5 +114,6 @@ public class MainActivity extends AppCompatActivity {
                     )
             );
         }
+        return items;
     }
 }

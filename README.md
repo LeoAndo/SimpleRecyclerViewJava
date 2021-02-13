@@ -1,4 +1,4 @@
-# SimpleRecyclerViewJava
+# RecyclerViewJavaSample
 sample for RecyclerView
 
 ## capture
